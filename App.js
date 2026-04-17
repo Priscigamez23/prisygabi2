@@ -1,85 +1,139 @@
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { Text, View, Button, StyleSheet } from 'react-native';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import {
+  ViroARScene,
+  ViroText,
+  ViroARSceneNavigator,
+  ViroNode
+} from '@reactvision/react-viro';
 
-export default function App() {
-  const [permission, requestPermission] = useCameraPermissions();
+const HelloWorldSceneAR = () => {
 
-  const [sensor, setSensor] = useState({
-    temperatura: 0,
-    humedad: 0,
-    ubicacion: "San Salvador",
-    estado: "Activo"
+  const [sensorData, setSensorData] = useState({
+    temperatura: "--",
+    humedad: "--",
+    ubicacion: "Cargando...",
+    estado: "..."
   });
 
-  // 🔵 Simulación de API
-  const obtenerDatos = () => {
-    setSensor({
-      temperatura: Math.floor(Math.random() * 35),
-      humedad: Math.floor(Math.random() * 100),
-      ubicacion: "San Salvador",
-      estado: "Activo"
-    });
+  const API_URL = "https://mocki.io/v1/af2be996-bedf-438b-bae0-ae28a998271a";
+
+  const obtenerDatos = async () => {
+    try {
+      const response = await fetch(API_URL);
+
+      if (!response.ok) throw new Error("API error");
+
+      const data = await response.json();
+
+      const temp = Number(data.temperatura) || 25;
+      const hum = Number(data.humedad) || 60;
+
+      setSensorData({
+        temperatura: temp + Math.floor(Math.random() * 3),
+        humedad: hum + Math.floor(Math.random() * 5),
+        ubicacion: data.ubicacion || "San Salvador",
+        estado: data.estado || "Activo"
+      });
+
+    } catch (error) {
+      console.log("ERROR:", error);
+
+      setSensorData({
+        temperatura: "Error",
+        humedad: "Error",
+        ubicacion: "Sin conexión",
+        estado: "Offline"
+      });
+    }
   };
 
-  // 🔄 cada 5 segundos
   useEffect(() => {
     obtenerDatos();
     const interval = setInterval(obtenerDatos, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // permisos cámara
-  if (!permission) {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Cargando cámara...</Text>
-    </View>
+    <ViroARScene>
+
+    
+      <ViroNode position={[0, 0, -2]}>
+
+        <ViroText
+          text="Sensor IoT"
+          scale={[0.3, 0.3, 0.3]}
+          style={styles.title}
+          position={[0, 0.4, 0]}
+        />
+
+        <ViroText
+          text={`Temperatura: ${sensorData.temperatura} °C`}
+          scale={[0.25, 0.25, 0.25]}
+          style={styles.text}
+          position={[0, 0.2, 0]}
+        />
+
+        <ViroText
+          text={`Humedad: ${sensorData.humedad} %`}
+          scale={[0.25, 0.25, 0.25]}
+          style={styles.text}
+          position={[0, 0.05, 0]}
+        />
+
+        <ViroText
+          text={`Ubicacion: ${sensorData.ubicacion}`}
+          scale={[0.22, 0.22, 0.22]}
+          style={styles.text}
+          position={[0, -0.1, 0]}
+        />
+
+        <ViroText
+          text={`Estado: ${sensorData.estado}`}
+          scale={[0.22, 0.22, 0.22]}
+          style={styles.text}
+          position={[0, -0.25, 0]}
+        />
+
+        <ViroText
+          text="Actualizar"
+          scale={[0.28, 0.28, 0.28]}
+          style={styles.button}
+          position={[0, -0.45, 0]}
+          onClick={obtenerDatos}
+        />
+
+      </ViroNode>
+
+    </ViroARScene>
   );
-}
-  if (!permission.granted) {
-    return <Button title="Permitir cámara" onPress={requestPermission} />;
-  }
+};
 
+export default function App() {
   return (
-    <View style={{ flex: 1 }}>
-      <CameraView style={StyleSheet.absoluteFill} facing="back">
-
-        {/* 🧊 PANEL AR */}
-        <View style={styles.panel}>
-          <Text style={styles.text}>🌡 Temp: {sensor.temperatura}°C</Text>
-          <Text style={styles.text}>💧 Humedad: {sensor.humedad}%</Text>
-          <Text style={styles.text}>📍 Ubicación: {sensor.ubicacion}</Text>
-          <Text style={styles.text}>⚡ Estado: {sensor.estado}</Text>
-        </View>
-
-        {/* 🔘 BOTÓN */}
-        <View style={styles.boton}>
-          <Button title="Actualizar" onPress={obtenerDatos} />
-        </View>
-
-      </CameraView>
-    </View>
+    <ViroARSceneNavigator
+      initialScene={{ scene: HelloWorldSceneAR }}
+      style={{ flex: 1 }}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  panel: {
-    position: 'absolute',
-    top: 120,
-    left: 30,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    padding: 15,
-    borderRadius: 15
+  title: {
+    fontSize: 28,
+    color: '#9A64A1',
+    textAlign: 'center',
+    fontWeight: 'bold'
   },
   text: {
-    color: 'white',
-    fontSize: 16,
-    marginBottom: 5
+    fontSize: 22,
+    color: '#ffffff',
+    textAlign: 'center',
   },
-  boton: {
-    position: 'absolute',
-    bottom: 60,
-    alignSelf: 'center'
+  button: {
+    fontSize: 24,
+    color: '#9A64A1',
+    textAlign: 'center',
+    fontWeight: 'bold'
   }
 });
