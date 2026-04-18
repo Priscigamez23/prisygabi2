@@ -9,7 +9,6 @@ import {
   ViroMaterials
 } from '@reactvision/react-viro';
 
-// 🎨 MATERIAL ROSA PASTEL
 ViroMaterials.createMaterials({
   botonMaterial: {
     diffuseColor: "#F8BBD0" 
