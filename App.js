@@ -5,15 +5,8 @@ import {
   ViroText,
   ViroARSceneNavigator,
   ViroNode,
-  ViroBox,
-  ViroMaterials
+  ViroBox
 } from '@reactvision/react-viro';
-
-ViroMaterials.createMaterials({
-  botonMaterial: {
-    diffuseColor: "#F8BBD0" 
-  }
-});
 
 const HelloWorldSceneAR = () => {
 
@@ -34,12 +27,9 @@ const HelloWorldSceneAR = () => {
 
       const data = await response.json();
 
-      const temp = Number(data.temperatura) || 25;
-      const hum = Number(data.humedad) || 60;
-
       setSensorData({
-        temperatura: (temp + (Math.random() * 2 - 1)).toFixed(1),
-        humedad: (hum + (Math.random() * 4 - 2)).toFixed(0),
+        temperatura: data.temperatura,
+        humedad: data.humedad,
         ubicacion: data.ubicacion || "San Salvador",
         estado: data.estado || "Activo",
         hora: new Date().toLocaleTimeString()
@@ -69,6 +59,7 @@ const HelloWorldSceneAR = () => {
 
       <ViroNode position={[0, 0, -2]}>
 
+        {/* TÍTULO */}
         <ViroText
           text="Sensor IoT"
           scale={[0.3, 0.3, 0.3]}
@@ -76,6 +67,7 @@ const HelloWorldSceneAR = () => {
           position={[0, 0.4, 0]}
         />
 
+        {/* DATOS */}
         <ViroText
           text={`Temperatura: ${sensorData.temperatura} °C`}
           scale={[0.25, 0.25, 0.25]}
@@ -102,9 +94,9 @@ const HelloWorldSceneAR = () => {
           scale={[0.22, 0.22, 0.22]}
           style={[
             styles.text,
-            { color: sensorData.estado === "Activo" ? "#F48FB1" : "#E57373" }
+            { color: sensorData.estado === "Activo" ? "#efb6df" : "#d76db2" }
           ]}
-          position={[0, -0.32, 0]}
+          position={[0, -0.3, 0]}
         />
 
         <ViroText
@@ -114,24 +106,16 @@ const HelloWorldSceneAR = () => {
           position={[0, -0.45, 0]}
         />
 
-        <ViroNode
-          position={[0, -0.65, 0]}
-          onClickState={(state) => {
-            if (state === 1) {
-              obtenerDatos();
-            }
-          }}
-        >
+        {/* BOTÓN REAL */}
+        <ViroNode position={[0, -0.7, 0]} onClick={obtenerDatos}>
           <ViroBox
-            scale={[0.5, 0.12, 0.05]} 
-            materials={["botonMaterial"]}
+            scale={[0.6, 0.2, 0.1]}
           />
-
           <ViroText
             text="ACTUALIZAR"
-            scale={[0.25, 0.25, 0.25]}
-            position={[0, 0, 0.04]}
+            scale={[0.2, 0.2, 0.2]}
             style={styles.buttonText}
+            position={[0, 0, 0.06]}
           />
         </ViroNode>
 
@@ -149,22 +133,26 @@ export default function App() {
     />
   );
 }
-
 const styles = StyleSheet.create({
   title: {
     fontSize: 28,
-    color: '#e988af', 
+    color: '#F8BBD0', // rosado
     textAlign: 'center',
     fontWeight: 'bold'
   },
   text: {
     fontSize: 22,
-    color: '#ffffff',
+    color: '#ffffff', // valores en blanco
+    textAlign: 'center'
+  },
+  label: {
+    fontSize: 22,
+    color: '#F8BBD0', // etiquetas en rosado
     textAlign: 'center'
   },
   buttonText: {
     fontSize: 20,
-    color: '#e28fb3', 
+    color: '#ffffff',
     textAlign: 'center',
     fontWeight: 'bold'
   }
