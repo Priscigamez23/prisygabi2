@@ -6,30 +6,30 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+
     "newArchEnabled": true,
+
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
+
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.hamsy.sensor"
+      "package": "com.terrygrandchester.sensor",
+      "permissions": ["CAMERA"]
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
+
+    "plugins": [
+      "@reactvision/react-viro"
+    ],
+
     "extra": {
       "eas": {
-        "projectId": "e05faffb-2e4f-434a-a2cd-f71414f60a8c"
+        "projectId": "bd307230-61e5-459b-9dce-7002f0364c8d"
       }
-    }
+    },
+
+    "owner": "terrygrandchester"
   }
 }

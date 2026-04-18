@@ -4,8 +4,17 @@ import {
   ViroARScene,
   ViroText,
   ViroARSceneNavigator,
-  ViroNode
+  ViroNode,
+  ViroBox,
+  ViroMaterials
 } from '@reactvision/react-viro';
+
+// 🎨 MATERIAL ROSA PASTEL
+ViroMaterials.createMaterials({
+  botonMaterial: {
+    diffuseColor: "#F8BBD0" 
+  }
+});
 
 const HelloWorldSceneAR = () => {
 
@@ -13,7 +22,8 @@ const HelloWorldSceneAR = () => {
     temperatura: "--",
     humedad: "--",
     ubicacion: "Cargando...",
-    estado: "..."
+    estado: "...",
+    hora: ""
   });
 
   const API_URL = "https://mocki.io/v1/af2be996-bedf-438b-bae0-ae28a998271a";
@@ -21,7 +31,6 @@ const HelloWorldSceneAR = () => {
   const obtenerDatos = async () => {
     try {
       const response = await fetch(API_URL);
-
       if (!response.ok) throw new Error("API error");
 
       const data = await response.json();
@@ -30,10 +39,11 @@ const HelloWorldSceneAR = () => {
       const hum = Number(data.humedad) || 60;
 
       setSensorData({
-        temperatura: temp + Math.floor(Math.random() * 3),
-        humedad: hum + Math.floor(Math.random() * 5),
+        temperatura: (temp + (Math.random() * 2 - 1)).toFixed(1),
+        humedad: (hum + (Math.random() * 4 - 2)).toFixed(0),
         ubicacion: data.ubicacion || "San Salvador",
-        estado: data.estado || "Activo"
+        estado: data.estado || "Activo",
+        hora: new Date().toLocaleTimeString()
       });
 
     } catch (error) {
@@ -43,7 +53,8 @@ const HelloWorldSceneAR = () => {
         temperatura: "Error",
         humedad: "Error",
         ubicacion: "Sin conexión",
-        estado: "Offline"
+        estado: "Offline",
+        hora: "--"
       });
     }
   };
@@ -55,9 +66,8 @@ const HelloWorldSceneAR = () => {
   }, []);
 
   return (
-    <ViroARScene>
+    <ViroARScene autofocus={true}>
 
-    
       <ViroNode position={[0, 0, -2]}>
 
         <ViroText
@@ -82,7 +92,7 @@ const HelloWorldSceneAR = () => {
         />
 
         <ViroText
-          text={`Ubicacion: ${sensorData.ubicacion}`}
+          text={`Ubicación: ${sensorData.ubicacion}`}
           scale={[0.22, 0.22, 0.22]}
           style={styles.text}
           position={[0, -0.1, 0]}
@@ -91,17 +101,40 @@ const HelloWorldSceneAR = () => {
         <ViroText
           text={`Estado: ${sensorData.estado}`}
           scale={[0.22, 0.22, 0.22]}
-          style={styles.text}
-          position={[0, -0.25, 0]}
+          style={[
+            styles.text,
+            { color: sensorData.estado === "Activo" ? "#F48FB1" : "#E57373" }
+          ]}
+          position={[0, -0.32, 0]}
         />
 
         <ViroText
-          text="Actualizar"
-          scale={[0.28, 0.28, 0.28]}
-          style={styles.button}
+          text={`Actualizado: ${sensorData.hora}`}
+          scale={[0.18, 0.18, 0.18]}
+          style={styles.text}
           position={[0, -0.45, 0]}
-          onClick={obtenerDatos}
         />
+
+        <ViroNode
+          position={[0, -0.65, 0]}
+          onClickState={(state) => {
+            if (state === 1) {
+              obtenerDatos();
+            }
+          }}
+        >
+          <ViroBox
+            scale={[0.5, 0.12, 0.05]} 
+            materials={["botonMaterial"]}
+          />
+
+          <ViroText
+            text="ACTUALIZAR"
+            scale={[0.25, 0.25, 0.25]}
+            position={[0, 0, 0.04]}
+            style={styles.buttonText}
+          />
+        </ViroNode>
 
       </ViroNode>
 
@@ -121,18 +154,18 @@ export default function App() {
 const styles = StyleSheet.create({
   title: {
     fontSize: 28,
-    color: '#9A64A1',
+    color: '#e988af', 
     textAlign: 'center',
     fontWeight: 'bold'
   },
   text: {
     fontSize: 22,
     color: '#ffffff',
-    textAlign: 'center',
+    textAlign: 'center'
   },
-  button: {
-    fontSize: 24,
-    color: '#9A64A1',
+  buttonText: {
+    fontSize: 20,
+    color: '#e28fb3', 
     textAlign: 'center',
     fontWeight: 'bold'
   }
